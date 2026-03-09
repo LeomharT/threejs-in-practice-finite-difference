@@ -3,6 +3,7 @@ import {
   AxesHelper,
   Color,
   DirectionalLight,
+  IcosahedronGeometry,
   Mesh,
   MeshStandardMaterial,
   PCFShadowMap,
@@ -11,7 +12,8 @@ import {
   Scene,
   ShaderChunk,
   ShaderMaterial,
-  SphereGeometry,
+  Timer,
+  Uniform,
   WebGLRenderer,
 } from "three";
 import { OrbitControls, TrackballControls } from "three/examples/jsm/Addons.js";
@@ -54,7 +56,7 @@ const scene = new Scene();
 scene.background = background;
 
 const camera = new PerspectiveCamera(75, size.width / size.height, 0.1, 1000);
-camera.position.set(5, 5, 5);
+camera.position.set(7, 7, 7);
 camera.lookAt(scene.position);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -69,14 +71,21 @@ controls2.noPan = true;
 controls2.noRotate = true;
 controls2.noZoom = false;
 
+const timer = new Timer();
+
 /**
  * World
  */
 
-const uniforms = {};
+const uniforms = {
+  uTime: new Uniform(0),
+
+  uWobbleFrequency: new Uniform(0.5),
+  uWobbleTimeScale: new Uniform(0.4),
+};
 
 // Plane
-const floorGeometry = new PlaneGeometry(10, 10, 32, 32);
+const floorGeometry = new PlaneGeometry(30, 30, 32, 32);
 const floorMaterial = new MeshStandardMaterial({});
 const floor = new Mesh(floorGeometry, floorMaterial);
 floor.receiveShadow = true;
@@ -84,15 +93,16 @@ floor.rotation.x = -Math.PI / 2;
 scene.add(floor);
 
 // Wobble sphere
-const sphereGeometry = new SphereGeometry(1, 32, 32);
+const sphereGeometry = new IcosahedronGeometry(2.5, 50);
 const sphereMaterial = new ShaderMaterial({
   vertexShader: wobbleVertexShader,
   fragmentShader: wobbleFragmentShader,
   wireframe: true,
+  uniforms,
 });
 const wobbleSphere = new Mesh(sphereGeometry, sphereMaterial);
 wobbleSphere.castShadow = true;
-wobbleSphere.position.y = 2.5;
+wobbleSphere.position.y = 3.0;
 scene.add(wobbleSphere);
 
 // Monkey
@@ -118,13 +128,23 @@ const pane = new Pane({ title: "Debug Params" });
 pane.element!.parentElement!.style.width = "380px";
 
 const f_sphere = pane.addFolder({ title: "🔵 Wobble Sphere" });
+f_sphere.addBinding(uniforms.uWobbleFrequency, "value", {
+  label: "WobbleFrequency",
+  step: 0.001,
+  min: 0,
+  max: 1.0,
+});
 
 /**
  * Events
  */
 
 function render() {
+  // Time
+  const elapsed = timer.getElapsed();
   // Update
+  uniforms.uTime.value = elapsed;
+  timer.update();
   controls.update();
   controls2.update();
   // Render
