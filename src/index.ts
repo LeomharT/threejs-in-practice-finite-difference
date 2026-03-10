@@ -14,9 +14,11 @@ import {
   ShaderMaterial,
   Timer,
   Uniform,
+  Vector3,
   WebGLRenderer,
 } from "three";
 import { OrbitControls, TrackballControls } from "three/examples/jsm/Addons.js";
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Pane } from "tweakpane";
 import simplex4DNoise from "./shader/includes/simplex4DNoise.glsl?raw";
 import wobbleFragmentShader from "./shader/wobble/fragment.glsl?raw";
@@ -80,9 +82,15 @@ const timer = new Timer();
 const uniforms = {
   uTime: new Uniform(0),
 
-  uWobbleFrequency: new Uniform(0.5),
+  uSunDirection: new Uniform(new Vector3()),
+
+  uWobbleFrequency: new Uniform(0.7),
   uWobbleTimeScale: new Uniform(0.4),
-  uWobbleIntensity: new Uniform(0.3),
+  uWobbleIntensity: new Uniform(1.3),
+
+  uWarpFrequency: new Uniform(0.38),
+  uWarpTimeScale: new Uniform(0.12),
+  uWarpIntensity: new Uniform(1.7),
 };
 
 // Plane
@@ -94,11 +102,15 @@ floor.rotation.x = -Math.PI / 2;
 scene.add(floor);
 
 // Wobble sphere
-const sphereGeometry = new IcosahedronGeometry(2.5, 50);
+let sphereGeometry = new IcosahedronGeometry(2.5, 50);
+sphereGeometry = mergeVertices(sphereGeometry) as typeof sphereGeometry;
+sphereGeometry.computeTangents();
+console.log(sphereGeometry);
+
 const sphereMaterial = new ShaderMaterial({
   vertexShader: wobbleVertexShader,
   fragmentShader: wobbleFragmentShader,
-  wireframe: true,
+  wireframe: false,
   uniforms,
 });
 const wobbleSphere = new Mesh(sphereGeometry, sphereMaterial);
@@ -110,8 +122,11 @@ scene.add(wobbleSphere);
 
 // Lights
 const directionalLight = new DirectionalLight("#ffffff", 2.5);
-directionalLight.position.set(3, 5, 0);
+directionalLight.position.set(3, 4, 0);
 directionalLight.castShadow = true;
+uniforms.uSunDirection.value.copy(
+  directionalLight.position.clone().normalize(),
+);
 scene.add(directionalLight);
 
 /**
@@ -131,6 +146,36 @@ pane.element!.parentElement!.style.width = "380px";
 const f_sphere = pane.addFolder({ title: "🔵 Wobble Sphere" });
 f_sphere.addBinding(uniforms.uWobbleFrequency, "value", {
   label: "WobbleFrequency",
+  step: 0.001,
+  min: 0,
+  max: 1.0,
+});
+f_sphere.addBinding(uniforms.uWobbleTimeScale, "value", {
+  label: "WobbleTimeScale",
+  step: 0.001,
+  min: 0,
+  max: 1.0,
+});
+f_sphere.addBinding(uniforms.uWobbleIntensity, "value", {
+  label: "WobbleIntensity",
+  step: 0.001,
+  min: 0,
+  max: 1.0,
+});
+f_sphere.addBinding(uniforms.uWarpFrequency, "value", {
+  label: "WarpFrequency",
+  step: 0.001,
+  min: 0,
+  max: 1.0,
+});
+f_sphere.addBinding(uniforms.uWarpTimeScale, "value", {
+  label: "WarpTimeScale",
+  step: 0.001,
+  min: 0,
+  max: 1.0,
+});
+f_sphere.addBinding(uniforms.uWarpIntensity, "value", {
+  label: "WarpIntensity",
   step: 0.001,
   min: 0,
   max: 1.0,
