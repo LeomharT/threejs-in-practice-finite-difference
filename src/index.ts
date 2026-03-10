@@ -82,6 +82,7 @@ const uniforms = {
 
   uWobbleFrequency: new Uniform(0.5),
   uWobbleTimeScale: new Uniform(0.4),
+  uWobbleIntensity: new Uniform(0.3),
 };
 
 // Plane

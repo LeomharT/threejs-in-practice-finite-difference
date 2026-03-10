@@ -1,6 +1,7 @@
 uniform float uTime;
 uniform float uWobbleFrequency;
 uniform float uWobbleTimeScale;
+uniform float uWobbleIntensity;
 
 varying float vWobble;
 
@@ -12,9 +13,9 @@ float getWobble(vec3 p)
     return snoise(
         vec4(
             p * uWobbleFrequency,
-            0.0 * uWobbleTimeScale
+            uTime * uWobbleTimeScale
         )
-    ) * 1.9;
+    ) * uWobbleIntensity;
 }
 
 
