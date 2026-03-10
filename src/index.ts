@@ -5,10 +5,12 @@ import {
   DirectionalLight,
   IcosahedronGeometry,
   Mesh,
+  MeshDepthMaterial,
   MeshStandardMaterial,
   PCFShadowMap,
   PerspectiveCamera,
   PlaneGeometry,
+  RGBADepthPacking,
   Scene,
   ShaderChunk,
   ShaderMaterial,
@@ -17,6 +19,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from "three";
+import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 import { OrbitControls, TrackballControls } from "three/examples/jsm/Addons.js";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Pane } from "tweakpane";
@@ -108,7 +111,17 @@ scene.add(floor);
 let sphereGeometry = new IcosahedronGeometry(2.5, 50);
 sphereGeometry = mergeVertices(sphereGeometry) as typeof sphereGeometry;
 sphereGeometry.computeTangents();
-console.log(sphereGeometry);
+
+const sphereDepthMaterial = new CustomShaderMaterial({
+  baseMaterial: MeshDepthMaterial,
+  vertexShader: wobbleVertexShader,
+  fragmentShader: wobbleFragmentShader,
+  uniforms,
+  depthPacking: RGBADepthPacking,
+});
+sphereDepthMaterial.defines = {
+  IS_DEPTH_MATERIAL: true,
+};
 
 const sphereMaterial = new ShaderMaterial({
   vertexShader: wobbleVertexShader,
@@ -119,6 +132,7 @@ const sphereMaterial = new ShaderMaterial({
 const wobbleSphere = new Mesh(sphereGeometry, sphereMaterial);
 wobbleSphere.castShadow = true;
 wobbleSphere.position.y = 3.0;
+wobbleSphere.customDepthMaterial = sphereDepthMaterial;
 scene.add(wobbleSphere);
 
 // Monkey
