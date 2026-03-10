@@ -84,13 +84,16 @@ const uniforms = {
 
   uSunDirection: new Uniform(new Vector3()),
 
-  uWobbleFrequency: new Uniform(0.7),
+  uWobbleFrequency: new Uniform(0.5),
   uWobbleTimeScale: new Uniform(0.4),
-  uWobbleIntensity: new Uniform(1.3),
+  uWobbleIntensity: new Uniform(0.3),
 
   uWarpFrequency: new Uniform(0.38),
   uWarpTimeScale: new Uniform(0.12),
   uWarpIntensity: new Uniform(1.7),
+
+  uColorA: new Uniform(new Color("#0000ff")),
+  uColorB: new Uniform(new Color("#ff0000")),
 };
 
 // Plane
@@ -124,6 +127,7 @@ scene.add(wobbleSphere);
 const directionalLight = new DirectionalLight("#ffffff", 2.5);
 directionalLight.position.set(3, 4, 0);
 directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.set(256, 256);
 uniforms.uSunDirection.value.copy(
   directionalLight.position.clone().normalize(),
 );

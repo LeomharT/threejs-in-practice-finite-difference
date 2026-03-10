@@ -1,3 +1,5 @@
+precision mediump float;
+
 attribute vec4 tangent;
 
 uniform float uTime;
@@ -20,14 +22,14 @@ float getWobble(vec3 p)
     warpedPosition += snoise(
         vec4(
             warpedPosition * uWarpFrequency, 
-            0.0 * uWarpTimeScale
+            uTime * uWarpTimeScale
         )
     ) * uWarpIntensity;
 
     return snoise(
         vec4(
             warpedPosition * uWobbleFrequency,
-            0.0 * uWobbleTimeScale
+            uTime * uWobbleTimeScale
         )
     ) * uWobbleIntensity;
 }
@@ -36,7 +38,7 @@ float getWobble(vec3 p)
 void main(){
     vec3  biTangent = cross(normal, tangent.xyz);
 
-    float shift     = 0.01;
+    float shift = 0.01;
 
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
     vec3 positionA     = modelPosition.xyz + tangent.xyz * shift;
