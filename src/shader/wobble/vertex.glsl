@@ -1,6 +1,7 @@
 attribute vec4 tangent;
 
 varying vec3 vNormal;
+varying float vWobble;
 
 uniform float uTime;
 uniform float uWobbleFrequency;
@@ -24,7 +25,7 @@ float getWobble(vec3 p) {
     return snoise(
         vec4(
             warpPosition * uWobbleFrequency,
-            uTime * uWarpTimeScale
+            uTime * uWobbleTimeScale
         )
     ) * uWobbleIntensity;
 }
@@ -60,4 +61,5 @@ void main() {
 
     // Varying
     vNormal = modelNormal.xyz;
+    vWobble = wobble;
 }

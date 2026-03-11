@@ -133,7 +133,7 @@ const sphereMaterial = new ShaderMaterial({
 });
 const wobbleSphere = new Mesh(sphereGeometry, sphereMaterial);
 wobbleSphere.castShadow = true;
-wobbleSphere.position.y = 3.0;
+wobbleSphere.position.y = 4.0;
 wobbleSphere.customDepthMaterial = sphereDepthMaterial;
 scene.add(wobbleSphere);
 
