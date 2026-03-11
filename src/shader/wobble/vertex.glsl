@@ -52,7 +52,11 @@ void main() {
     vec4 viewPosition       = viewMatrix * modelPosition;
     vec4 projectionPosition = projectionMatrix * viewPosition;
 
-    gl_Position = projectionPosition;
+    #ifdef IS_DEPTH_MATERIAL
+        csm_Position += wobble * normal;
+    #else
+        gl_Position = projectionPosition;
+    #endif
 
     // Varying
     vNormal = modelNormal.xyz;
