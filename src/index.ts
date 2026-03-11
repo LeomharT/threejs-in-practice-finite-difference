@@ -1,4 +1,5 @@
 import { Colors } from "@blueprintjs/colors";
+import * as EssentialsPlugin from "@tweakpane/plugin-essentials";
 import {
   AxesHelper,
   Color,
@@ -111,6 +112,7 @@ scene.add(floor);
 let sphereGeometry = new IcosahedronGeometry(2.5, 50);
 sphereGeometry = mergeVertices(sphereGeometry) as typeof sphereGeometry;
 sphereGeometry.computeTangents();
+console.log(sphereGeometry);
 
 const sphereDepthMaterial = new CustomShaderMaterial({
   baseMaterial: MeshDepthMaterial,
@@ -160,6 +162,14 @@ scene.add(axesHelper);
 
 const pane = new Pane({ title: "Debug Params" });
 pane.element!.parentElement!.style.width = "380px";
+pane.registerPlugin(EssentialsPlugin);
+
+// Add a FPS graph
+const fpsGraph: any = pane.addBlade({
+  view: "fpsgraph",
+  label: undefined,
+  rows: 3,
+});
 
 const f_sphere = pane.addFolder({ title: "🔵 Wobble Sphere" });
 f_sphere.addBinding(uniforms.uWobbleFrequency, "value", {
@@ -204,6 +214,7 @@ f_sphere.addBinding(uniforms.uWarpIntensity, "value", {
  */
 
 function render() {
+  fpsGraph.begin();
   // Time
   const elapsed = timer.getElapsed();
   // Update
@@ -215,6 +226,7 @@ function render() {
   renderer.render(scene, camera);
   // Animation
   requestAnimationFrame(render);
+  fpsGraph.end();
 }
 render();
 
