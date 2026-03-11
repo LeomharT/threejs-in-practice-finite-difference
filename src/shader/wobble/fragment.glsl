@@ -21,7 +21,7 @@ void main(){
         colorMix
     );
 
-    color += lightColor;
+    color += min(lightColor, 0.52);
 
     gl_FragColor = vec4(color, 1.0);
 
